@@ -3259,6 +3259,7 @@
       };
 
       let remoteSuccess = false;
+      let remoteError = ``;
       try {
         const res = await fetch(SHEETS_WEB_APP_ENDPOINT, {
           method: `POST`,
@@ -3266,11 +3267,20 @@
           headers: { 'Content-Type': `text/plain;charset=utf-8` },
           body: JSON.stringify(exportPayload)
         });
-        if (res && res.ok) {
+        const rawText = await res.text();
+        let out = null;
+        try { out = JSON.parse(rawText); } catch (_) {}
+        if (res.ok && out && out.ok) {
           remoteSuccess = true;
+        } else if (out && out.error) {
+          remoteError = `Sheet error: ` + out.error;
+        } else if (!res.ok) {
+          remoteError = `HTTP ` + res.status;
+        } else {
+          remoteError = `Endpoint gave an unexpected reply. Check the Apps Script deployment is set to "Anyone" and uses the latest Code.gs.`;
         }
       } catch (e) {
-        remoteSuccess = false;
+        remoteError = `Could not reach the endpoint (` + (e && e.message ? e.message : e) + `). Check the deployment access is "Anyone".`;
       }
 
       appState.lastSavedAt = formatShopTimestamp(new Date());
@@ -3282,7 +3292,7 @@
       } else {
         await persistDeviceState();
         updateSummaryAndBadges();
-        showStatusBanner(tr.msgSavedOffline, `warning`);
+        showStatusBanner(tr.msgSavedOffline + (remoteError ? ` [` + remoteError + `]` : ``), `warning`);
       }
 
       setSavingUi(false);
