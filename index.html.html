@@ -1,0 +1,2528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="terracotta">
+  <title>Cake Avenue — Cake &amp; Treat Cataloger</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces (Terracotta style) */
+      --background: #f9f3eb;
+      --surface-container-low: #f3e9dc;
+      --surface-container: #ede0d0;
+      --surface-container-high: #e4d4c0;
+      --surface-elevated: #fcf8f2;
+
+      /* Ink */
+      --on-surface: #261b15;
+      --on-surface-variant: #57483f;
+
+      /* Borders & rules */
+      --outline: #9e8a78;
+      --outline-variant: #dfd0be;
+      --featured-border: #c98a6b;
+      --tertiary-border: #b5d6c9;
+      --secondary-btn-border: #c4b29e;
+      --brass-edge: #d8c3b0;
+
+      /* Accents */
+      --primary: #b84a24;
+      --primary-hover: #9f3d1b;
+      --on-primary: #ffffff;
+      --primary-container: #f7ebe0;
+      --on-primary-container: #7d2e12;
+      --secondary: #8f6524;
+      --tertiary: #1d6356;
+      --tertiary-container: #e1efe9;
+      --on-tertiary-container: #13473d;
+      --error: #b82929;
+      --on-error: #ffffff;
+      --error-container: #fbe8e8;
+
+      /* Semantic */
+      --positive: #1d6356;
+      --warning: #9a5b13;
+      --warning-container: #f9ebd2;
+      --on-warning-container: #693b08;
+      --warning-border: #dfc08d;
+
+      /* Focus */
+      --focus: #b84a24;
+
+      /* Data series */
+      --data-1: #b84a24;
+      --data-2: #1d6356;
+      --data-3: #b5893e;
+      --data-4: #8c3838;
+      --data-context: #a39384;
+
+      /* Fonts */
+      --font-headline: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-label: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+      /* Type scale (Focused Tool + Cormorant display adjustment) */
+      --display-size: clamp(2rem, 1.5rem + 1.8vw, 2.75rem);
+      --headline-size: clamp(1.375rem, 1.15rem + 0.6vw, 1.75rem);
+      --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+
+      /* Shape */
+      --rounded: 0.375rem;
+      --rounded-lg: 0.75rem;
+      --rounded-arch: 28px 28px 6px 6px;
+      --rounded-full: 9999px;
+
+      /* Style effects */
+      --soft-shadow: 0 4px 18px rgb(38 27 21 / 0.04);
+      --soft-shadow-raised: 0 8px 28px rgb(38 27 21 / 0.08);
+      --warm-hairline: 1px solid var(--outline-variant);
+      --brass-gradient: linear-gradient(90deg, var(--brass-edge), var(--data-3), var(--brass-edge));
+      --modal-backdrop: rgb(38 27 21 / 0.45);
+      --focus-shadow: 0 0 0 3px rgb(184 74 36 / 0.22);
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+    svg { flex-shrink: 0; }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    /* Page container */
+    .page-grid {
+      display: grid;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      max-width: 1220px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Header / Masthead */
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-md) var(--space-lg);
+      align-items: end;
+      padding-bottom: var(--space-md);
+      border-bottom: var(--warm-hairline);
+    }
+    .kicker-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xs);
+    }
+    .kicker {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+    .badge-emerald {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      background: var(--tertiary-container);
+      color: var(--on-tertiary-container);
+      border: 1px solid var(--tertiary-border);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded-full);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .badge-waiting {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background: var(--warning-container);
+      color: var(--on-warning-container);
+      border: 1px solid var(--warning-border);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded-full);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--rounded-full);
+      background-color: var(--warning);
+      display: inline-block;
+    }
+    .badge-emerald .status-dot {
+      background-color: var(--tertiary);
+    }
+
+    .title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: var(--display-size);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .title em {
+      font-style: italic;
+      color: var(--primary);
+    }
+    .subtitle {
+      margin: var(--space-xs) 0 0;
+      color: var(--on-surface-variant);
+      max-width: 65ch;
+      font-size: var(--body-size);
+    }
+
+    .masthead-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--space-sm);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--rounded-full);
+      border: 1px solid transparent;
+      font-family: var(--font-label);
+      font-size: var(--body-size);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color var(--dur-short) var(--ease-out),
+                  transform var(--dur-micro) var(--ease-out),
+                  box-shadow var(--dur-short) var(--ease-out);
+      white-space: nowrap;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      box-shadow: var(--soft-shadow);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-hover);
+      box-shadow: var(--soft-shadow-raised);
+    }
+
+    .btn-secondary {
+      background-color: var(--surface-elevated);
+      color: var(--on-surface);
+      border-color: var(--secondary-btn-border);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background-color: var(--surface-container-low);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .btn-emerald {
+      background-color: var(--tertiary);
+      color: var(--on-primary);
+      box-shadow: var(--soft-shadow);
+    }
+    .btn-emerald:hover:not(:disabled) {
+      box-shadow: var(--soft-shadow-raised);
+    }
+
+    .btn-quiet {
+      background-color: var(--surface-container-low);
+      color: var(--on-surface);
+      border-color: var(--outline-variant);
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+    }
+    .btn-quiet:hover:not(:disabled) {
+      background-color: var(--surface-container);
+    }
+
+    .btn-danger-soft {
+      background-color: var(--error-container);
+      color: var(--error);
+      border-color: var(--outline-variant);
+      padding: var(--space-xs) var(--space-md);
+      min-height: 44px;
+      font-size: 0.875rem;
+    }
+
+    .btn-sm {
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      font-size: 0.875rem;
+    }
+
+    /* Inline status toast / feedback bar */
+    .feedback-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded-lg);
+      background-color: var(--tertiary-container);
+      color: var(--on-tertiary-container);
+      border: 1px solid var(--tertiary-border);
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+    .feedback-banner.is-visible { display: flex; }
+    .feedback-banner.is-warn {
+      background-color: var(--warning-container);
+      color: var(--on-warning-container);
+      border-color: var(--warning-border);
+    }
+
+    /* Arch Summary Row */
+    .arch-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+    .arch-card {
+      background: var(--surface-container-low);
+      border: var(--warm-hairline);
+      border-radius: var(--rounded-arch);
+      padding: var(--space-lg) var(--space-md) var(--space-md);
+      text-align: center;
+      box-shadow: var(--soft-shadow);
+      transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out);
+    }
+    .arch-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--soft-shadow-raised);
+    }
+    .arch-card.is-featured {
+      background: var(--primary-container);
+      border-color: var(--featured-border);
+    }
+    .arch-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      margin-bottom: var(--space-xs);
+    }
+    .arch-value {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: clamp(1.875rem, 1.5rem + 1vw, 2.5rem);
+      line-height: 1.05;
+      color: var(--on-surface);
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    .arch-note {
+      margin-top: var(--space-xs);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--tertiary);
+    }
+    .arch-card.is-featured .arch-note {
+      color: var(--on-primary-container);
+    }
+
+    /* Workspace 2-Column Split */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .panel {
+      background-color: var(--surface-container-low);
+      border: var(--warm-hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--soft-shadow);
+      container-type: inline-size;
+    }
+    .panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .panel-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: var(--headline-size);
+      line-height: 1.15;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .panel-title em {
+      font-style: italic;
+      color: var(--primary);
+    }
+    .panel-kicker {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--secondary);
+      margin-bottom: var(--space-xs);
+      display: block;
+    }
+
+    /* Photo Capture Zone */
+    .photo-dropzone {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-lg);
+      border: 2px dashed var(--outline);
+      border-radius: var(--rounded-lg);
+      background-color: var(--surface-elevated);
+      text-align: center;
+      transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out);
+    }
+    .photo-dropzone.is-dragover {
+      background-color: var(--primary-container);
+      border-color: var(--primary);
+    }
+    .btn-camera-hero {
+      width: 100%;
+      min-height: 54px;
+      font-size: 1.0625rem;
+      padding: var(--space-md) var(--space-lg);
+    }
+    .hidden-file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .sample-photo-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+      align-items: center;
+    }
+    .sample-label {
+      font-size: var(--label-size);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--on-surface-variant);
+      width: 100%;
+    }
+
+    /* Chips */
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded-full);
+      border: 1px solid var(--outline-variant);
+      background-color: var(--surface-elevated);
+      color: var(--on-surface);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .chip:hover {
+      background-color: var(--surface-container);
+    }
+    .chip.is-active {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .chip-compact {
+      min-height: 36px;
+      padding: var(--space-xs) var(--space-sm);
+      font-size: 0.8125rem;
+    }
+
+    /* Suggested Details Card */
+    .suggested-box {
+      margin-top: var(--space-md);
+      padding: var(--space-md);
+      background-color: var(--primary-container);
+      border: 1px solid var(--featured-border);
+      border-radius: var(--rounded-lg);
+      display: grid;
+      gap: var(--space-md);
+    }
+    .suggested-top {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: var(--space-md);
+      align-items: center;
+    }
+    .preview-thumb {
+      width: 88px;
+      height: 88px;
+      border-radius: var(--rounded);
+      border: var(--warm-hairline);
+      background-color: var(--surface-elevated);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .suggested-meta {
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .suggested-name {
+      font-family: var(--font-headline);
+      font-size: 1.375rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .suggested-desc {
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      margin: 0;
+    }
+    .suggested-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    /* Markup Helper */
+    .markup-box {
+      margin-top: var(--space-md);
+      padding: var(--space-md);
+      background-color: var(--surface-container);
+      border-radius: var(--rounded-lg);
+      border: var(--warm-hairline);
+    }
+    .markup-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-sm);
+      align-items: end;
+      margin-top: var(--space-sm);
+    }
+
+    /* Forms & Inputs */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .field.is-full {
+      grid-column: 1 / -1;
+    }
+    .field-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+    }
+    .input-control, .select-control, .textarea-control {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background-color: var(--surface-elevated);
+      border: 1px solid var(--outline);
+      border-radius: var(--rounded);
+      color: var(--on-surface);
+      font-size: var(--body-size);
+      transition: border-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+    }
+    .select-control {
+      padding-right: var(--space-xl);
+      cursor: pointer;
+    }
+    .textarea-control {
+      min-height: 76px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .input-control:focus, .select-control:focus, .textarea-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: var(--focus-shadow);
+    }
+    .price-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .price-prefix {
+      position: absolute;
+      left: var(--space-md);
+      font-weight: 700;
+      color: var(--on-surface-variant);
+      pointer-events: none;
+    }
+    .price-wrap .input-control {
+      padding-left: var(--space-xl);
+      font-variant-numeric: tabular-nums;
+    }
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: var(--warm-hairline);
+    }
+
+    /* Ornamental Brass Divider */
+    .ornament-rule {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-block: var(--space-xs);
+      color: var(--secondary);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .ornament-rule::before,
+    .ornament-rule::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--brass-gradient);
+    }
+
+    /* Catalog Table Section */
+    .catalog-section {
+      background-color: var(--surface-container-low);
+      border: var(--warm-hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--soft-shadow);
+    }
+    .catalog-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    .catalog-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .search-box {
+      flex: 1 1 240px;
+      max-width: 340px;
+    }
+
+    /* Spreadsheet-style Table */
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: var(--rounded);
+      border: var(--warm-hairline);
+      background-color: var(--surface-elevated);
+    }
+    .catalog-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }
+    .catalog-table thead th {
+      background-color: var(--surface-container);
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: var(--space-md) var(--space-sm);
+      border-bottom: 1px solid var(--outline-variant);
+      white-space: nowrap;
+    }
+    .catalog-table tbody tr {
+      border-bottom: 1px solid var(--outline-variant);
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .catalog-table tbody tr:last-child {
+      border-bottom: none;
+    }
+    .catalog-table tbody tr:hover {
+      background-color: var(--primary-container);
+    }
+    .catalog-table tbody tr.is-missing-size {
+      background-color: var(--warning-container);
+    }
+    .catalog-table td {
+      padding: var(--space-sm);
+      vertical-align: top;
+    }
+
+    .cell-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--rounded);
+      border: var(--warm-hairline);
+      background-color: var(--surface-container-low);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cell-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .cell-input, .cell-select {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-sm);
+      border: 1px solid transparent;
+      border-radius: var(--rounded);
+      background-color: transparent;
+      color: var(--on-surface);
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+    .cell-input:hover, .cell-select:hover {
+      background-color: var(--surface-container-low);
+      border-color: var(--outline-variant);
+    }
+    .cell-input:focus, .cell-select:focus {
+      outline: none;
+      background-color: var(--surface-elevated);
+      border-color: var(--primary);
+      box-shadow: var(--focus-shadow);
+    }
+    .cell-input.is-price {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      width: 96px;
+    }
+    .cell-input.is-missing {
+      background-color: var(--surface-elevated);
+      border-color: var(--warning);
+    }
+    .missing-hint {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
+    }
+    .mini-chip {
+      padding: 2px 8px;
+      min-height: 28px;
+      border-radius: var(--rounded-full);
+      border: 1px solid var(--warning-border);
+      background-color: var(--surface-elevated);
+      color: var(--on-warning-container);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mini-chip:hover {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    .row-actions {
+      display: flex;
+      gap: var(--space-xs);
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-2xl) var(--space-lg);
+      background-color: var(--surface-elevated);
+      border: 1px dashed var(--outline);
+      border-radius: var(--rounded-lg);
+      display: grid;
+      gap: var(--space-md);
+      justify-items: center;
+    }
+    .empty-state h3 {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      margin: 0;
+    }
+    .empty-state p {
+      margin: 0;
+      color: var(--on-surface-variant);
+      max-width: 52ch;
+    }
+
+    /* Paste Quick List Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: var(--modal-backdrop);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md);
+      z-index: 100;
+    }
+    .modal-backdrop.is-open {
+      display: flex;
+    }
+    .modal-dialog {
+      width: 100%;
+      max-width: 860px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background-color: var(--background);
+      border: var(--warm-hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--soft-shadow-raised);
+      display: grid;
+      gap: var(--space-md);
+    }
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-md);
+      border-bottom: var(--warm-hairline);
+      padding-bottom: var(--space-sm);
+    }
+    .parsed-preview-list {
+      display: grid;
+      gap: var(--space-sm);
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: var(--space-xs);
+    }
+    .parsed-row-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr) 90px;
+      gap: var(--space-sm);
+      padding: var(--space-sm);
+      background-color: var(--surface-elevated);
+      border: var(--warm-hairline);
+      border-radius: var(--rounded);
+      align-items: center;
+    }
+
+    /* Canva Guide Section */
+    .canva-guide {
+      background-color: var(--surface-container);
+      border: var(--warm-hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+    }
+    .guide-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+    .guide-step {
+      background-color: var(--surface-elevated);
+      border: var(--warm-hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+    }
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--rounded-full);
+      background-color: var(--primary);
+      color: var(--on-primary);
+      font-weight: 700;
+      font-size: 0.875rem;
+      margin-bottom: var(--space-sm);
+    }
+    .guide-step h4 {
+      margin: 0 0 var(--space-xs);
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+    }
+    .guide-step p {
+      margin: 0;
+      font-size: 0.9375rem;
+      color: var(--on-surface-variant);
+    }
+
+    /* Container queries & Responsive */
+    @container (max-width: 440px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .suggested-top { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 960px) {
+      .masthead { grid-template-columns: 1fr; }
+      .masthead-actions { justify-content: flex-start; }
+      .workspace-grid { grid-template-columns: 1fr; }
+      .arch-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid { padding: var(--space-md); gap: var(--space-md); }
+      .arch-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .form-grid { grid-template-columns: 1fr; }
+      .parsed-row-card { grid-template-columns: 1fr; }
+      .markup-row { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-grid">
+
+    <!-- Header & Primary Actions -->
+    <header class="masthead">
+      <div>
+        <div class="kicker-row">
+          <span class="kicker">Cake Avenue · Shop Cataloger</span>
+          <span id="header-unsaved-badge" class="badge-emerald" role="status" aria-live="polite">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="header-unsaved-text">All items saved</span>
+          </span>
+        </div>
+        <h1 class="title">Catalog Your <em>Cakes &amp; Treats</em></h1>
+        <p class="subtitle">Snap a photo, paste a quick price list, or tap sizes to build your Cake &amp; Treat List — ready to download for your online store.</p>
+      </div>
+
+      <div class="masthead-actions">
+        <button type="button" class="btn btn-secondary" id="btn-save-top" onclick="handleSaveList()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save List
+        </button>
+        <button type="button" class="btn btn-primary" id="btn-download-top" onclick="handleDownloadForStore()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for Store
+        </button>
+      </div>
+    </header>
+
+    <!-- Inline Feedback Banner (replaces any browser popups) -->
+    <div id="feedback-banner" class="feedback-banner" role="status" aria-live="polite">
+      <span id="feedback-message"></span>
+      <button type="button" class="btn btn-quiet btn-sm" onclick="dismissFeedback()">Dismiss</button>
+    </div>
+
+    <!-- Summary Arch Metrics -->
+    <section class="arch-row" aria-label="Catalog Summary">
+      <div class="arch-card">
+        <div class="arch-label">Total Items</div>
+        <div class="arch-value" id="stat-total-items">0</div>
+        <div class="arch-note">In Cake &amp; Treat List</div>
+      </div>
+      <div class="arch-card">
+        <div class="arch-label">Cakes &amp; Bentos</div>
+        <div class="arch-value" id="stat-cakes-count">0</div>
+        <div class="arch-note">Bentos, rounds &amp; tubs</div>
+      </div>
+      <div class="arch-card">
+        <div class="arch-label">Average Price</div>
+        <div class="arch-value" id="stat-avg-price">&#8369;0</div>
+        <div class="arch-note">Listed in PHP</div>
+      </div>
+      <div class="arch-card is-featured">
+        <div class="arch-label">Store Readiness</div>
+        <div class="arch-value" id="stat-ready-count">0</div>
+        <div class="arch-note" id="stat-ready-note">Complete items ready</div>
+      </div>
+    </section>
+
+    <!-- Two-Column Capture & Quick Entry Workspace -->
+    <section class="workspace-grid" aria-label="Add New Bakery Items">
+
+      <!-- Left: Photo Capture & Suggested Details -->
+      <div class="panel">
+        <span class="panel-kicker">Step 1 · Snap or Pick a Photo</span>
+        <div class="panel-header">
+          <h2 class="panel-title">Photo &amp; <em>Suggested Details</em></h2>
+        </div>
+
+        <div id="photo-dropzone" class="photo-dropzone">
+          <input type="file" id="photo-file-input" class="hidden-file-input" accept="image/*" capture="environment" onchange="handlePhotoSelected(this)">
+          <button type="button" class="btn btn-primary btn-camera-hero" onclick="triggerPhotoPicker()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Take Photo
+          </button>
+          <span class="subtitle">Tap to open camera, pick an image from your device, or drop a photo here.</span>
+        </div>
+
+        <div class="sample-photo-strip">
+          <span class="sample-label">Or test with a sample bakery photo:</span>
+          <button type="button" class="chip chip-compact" onclick="useSamplePhoto('chocomoist-bento')">Chocomoist Bento</button>
+          <button type="button" class="chip chip-compact" onclick="useSamplePhoto('ube-round')">Ube de Leche 8x3</button>
+          <button type="button" class="chip chip-compact" onclick="useSamplePhoto('cookies-box')">Cookies Dozen</button>
+          <button type="button" class="chip chip-compact" onclick="useSamplePhoto('chocomoist-tub')">Chocomoist Tub</button>
+        </div>
+
+        <!-- Suggested Details Preview Card -->
+        <div id="suggested-card" class="suggested-box" style="display: none;">
+          <div class="suggested-top">
+            <div class="preview-thumb" id="suggested-thumb"></div>
+            <div class="suggested-meta">
+              <span class="panel-kicker">Suggested Details</span>
+              <h3 class="suggested-name" id="suggested-title">Chocomoist Bento Cake</h3>
+              <p class="suggested-desc" id="suggested-summary">Bento Cakes · 4&quot;x3&quot; · &#8369;250 PHP</p>
+              <p class="suggested-desc" id="suggested-blurb"></p>
+            </div>
+          </div>
+          <div class="suggested-actions">
+            <button type="button" class="btn btn-primary btn-sm" onclick="addSuggestedDirectly()">Add Straight to List</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="applySuggestionToForm()">Edit Details First</button>
+            <button type="button" class="btn btn-quiet btn-sm" onclick="cyclePhotoSuggestion()">Try Another Match</button>
+          </div>
+        </div>
+
+        <!-- Simple Price Markup Helper -->
+        <div class="markup-box">
+          <span class="panel-kicker">Simple Price Helper (PHP)</span>
+          <div class="markup-row">
+            <div class="field">
+              <label class="field-label" for="cost-helper-input">Ingredients &amp; Box Cost (PHP)</label>
+              <div class="price-wrap">
+                <span class="price-prefix">&#8369;</span>
+                <input type="number" id="cost-helper-input" class="input-control" min="0" step="5" value="160" oninput="previewMarkupHelper()">
+              </div>
+            </div>
+            <div class="chip-group">
+              <button type="button" class="chip chip-compact" onclick="applyMarkupPercent(25)">+25%</button>
+              <button type="button" class="chip chip-compact" onclick="applyMarkupPercent(40)">+40%</button>
+              <button type="button" class="chip chip-compact" onclick="applyMarkupPercent(60)">+60%</button>
+            </div>
+          </div>
+          <p class="subtitle" id="markup-helper-result">Enter your cost above and tap a markup button to fill the selling price.</p>
+        </div>
+      </div>
+
+      <!-- Right: Quick Entry Form & One-Tap Size Chips -->
+      <div class="panel">
+        <span class="panel-kicker">Step 2 · Add or Paste Items</span>
+        <div class="panel-header">
+          <h2 class="panel-title">Quick Item <em>Entry</em></h2>
+          <button type="button" class="btn btn-emerald" onclick="openPasteModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            Paste Quick List
+          </button>
+        </div>
+
+        <form id="item-entry-form" onsubmit="handleFormSubmit(event)">
+          <div class="form-grid">
+            <div class="field is-full">
+              <label class="field-label" for="entry-name">Item Name</label>
+              <input type="text" id="entry-name" class="input-control" placeholder="e.g. Chocomoist Bento Cake" required>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="entry-category">Bakery Category</label>
+              <select id="entry-category" class="select-control">
+                <option value="Bento Cakes">Bento Cakes</option>
+                <option value="Round &amp; Layer Cakes">Round &amp; Layer Cakes</option>
+                <option value="Cakes in a Tub">Cakes in a Tub</option>
+                <option value="Cookies &amp; Bars">Cookies &amp; Bars</option>
+                <option value="Macaroons &amp; Treats">Macaroons &amp; Treats</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="entry-price">Price (PHP)</label>
+              <div class="price-wrap">
+                <span class="price-prefix">&#8369;</span>
+                <input type="number" id="entry-price" class="input-control" min="0" step="1" placeholder="250" required>
+              </div>
+            </div>
+
+            <div class="field is-full">
+              <label class="field-label" for="entry-size">Size / Pack (or tap a quick chip below)</label>
+              <input type="text" id="entry-size" class="input-control" placeholder="e.g. 4&quot;x3&quot;, 7x3, 8x3, 1 dozen, 20 pcs, Tub">
+              <div class="chip-group" id="quick-size-chips" role="group" aria-label="Quick Size Chips">
+                <button type="button" class="chip chip-compact" onclick="pickSizeChip('4&quot;x3&quot;', 'Bento Cakes', this)">4&quot;x3&quot;</button>
+                <button type="button" class="chip chip-compact" onclick="pickSizeChip('7x3', 'Round &amp; Layer Cakes', this)">7x3</button>
+                <button type="button" class="chip chip-compact" onclick="pickSizeChip('8x3', 'Round &amp; Layer Cakes', this)">8x3</button>
+                <button type="button" class="chip chip-compact" onclick="pickSizeChip('1 dozen', 'Cookies &amp; Bars', this)">1 dozen</button>
+                <button type="button" class="chip chip-compact" onclick="pickSizeChip('20 pcs', 'Macaroons &amp; Treats', this)">20 pcs</button>
+                <button type="button" class="chip chip-compact" onclick="pickSizeChip('Tub', 'Cakes in a Tub', this)">Tub</button>
+              </div>
+            </div>
+
+            <div class="field is-full">
+              <label class="field-label" for="entry-desc">Short Description</label>
+              <textarea id="entry-desc" class="textarea-control" placeholder="Leave blank to auto-fill a warm bakery description, or type your own..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btn-add-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add to Cake &amp; Treat List
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="addAndKeepForNextSize()">
+              Add &amp; Duplicate for Next Size
+            </button>
+            <button type="button" class="btn btn-quiet" onclick="resetEntryForm()">Clear</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <div class="ornament-rule" aria-hidden="true">&#9670; Cake &amp; Treat List &#9670;</div>
+
+    <!-- Editable Spreadsheet-Style Catalog Table -->
+    <section class="catalog-section" aria-label="Cake and Treat List">
+      <div class="catalog-topbar">
+        <div>
+          <span class="panel-kicker">Step 3 · Tap Any Cell to Edit</span>
+          <h2 class="panel-title">Cake &amp; Treat <em>List</em></h2>
+        </div>
+
+        <div class="masthead-actions">
+          <span id="table-unsaved-badge" class="badge-emerald" role="status" aria-live="polite">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="table-unsaved-text">All items saved</span>
+          </span>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="handleSaveList()">Save List</button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="handleDownloadForStore()">Download for Store</button>
+        </div>
+      </div>
+
+      <div class="catalog-controls">
+        <div class="search-box">
+          <label class="field-label" for="catalog-search">Search List</label>
+          <input type="search" id="catalog-search" class="input-control" placeholder="Filter by cake name, size, or treat..." oninput="renderCatalogTable()">
+        </div>
+
+        <div class="chip-group" id="category-filter-chips" role="group" aria-label="Filter by Bakery Category">
+          <button type="button" class="chip chip-compact is-active" onclick="setCategoryFilter('All', this)">All</button>
+          <button type="button" class="chip chip-compact" onclick="setCategoryFilter('Bento Cakes', this)">Bento Cakes</button>
+          <button type="button" class="chip chip-compact" onclick="setCategoryFilter('Round &amp; Layer Cakes', this)">Round &amp; Layer</button>
+          <button type="button" class="chip chip-compact" onclick="setCategoryFilter('Cakes in a Tub', this)">Tubs</button>
+          <button type="button" class="chip chip-compact" onclick="setCategoryFilter('Cookies &amp; Bars', this)">Cookies &amp; Bars</button>
+          <button type="button" class="chip chip-compact" onclick="setCategoryFilter('Macaroons &amp; Treats', this)">Macaroons &amp; Treats</button>
+          <button type="button" class="chip chip-compact" onclick="setCategoryFilter('Missing Size', this)">Needs Size</button>
+        </div>
+
+        <button type="button" class="btn btn-danger-soft" id="btn-clear-all" onclick="handleClearAll(this)">Clear List</button>
+      </div>
+
+      <!-- Empty State -->
+      <div id="catalog-empty-state" class="empty-state">
+        <h3>Your Cake &amp; Treat List Is Empty</h3>
+        <p>Take a photo on the left, paste your shop&rsquo;s price list using <strong>Paste Quick List</strong>, or load a 10-item bakery starter menu to see how it works.</p>
+        <div class="suggested-actions">
+          <button type="button" class="btn btn-primary" onclick="loadStarterBakeryList()">Load 10 Sample Bakery Items</button>
+          <button type="button" class="btn btn-secondary" onclick="openPasteModal()">Paste Quick List</button>
+        </div>
+      </div>
+
+      <!-- Spreadsheet Table -->
+      <div id="catalog-table-wrap" class="table-scroll" style="display: none;">
+        <table class="catalog-table">
+          <thead>
+            <tr>
+              <th>Photo</th>
+              <th>Item Name</th>
+              <th>Bakery Category</th>
+              <th>Size / Pack</th>
+              <th>Short Description</th>
+              <th>Price (PHP)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="catalog-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Canva Website Embed Guide -->
+    <section class="canva-guide" id="canva-guide-section" aria-label="Canva Website Embed Instructions">
+      <div class="panel-header">
+        <div>
+          <span class="panel-kicker">Works Inside Canva Websites</span>
+          <h2 class="panel-title">How to Add This Tool to Your <em>Canva Website</em></h2>
+        </div>
+        <button type="button" class="btn btn-quiet btn-sm" id="btn-toggle-guide" onclick="toggleCanvaGuide()">Hide Guide</button>
+      </div>
+
+      <div id="canva-guide-body">
+        <p class="subtitle">This page adjusts cleanly to fit inside a Canva Website frame on phones, tablets, and laptops. Follow these simple steps to put it on your shop&rsquo;s Canva site:</p>
+        <div class="guide-steps">
+          <div class="guide-step">
+            <span class="step-num">1</span>
+            <h4>Put This Page Online</h4>
+            <p>Upload this single web page file to any free host (such as Netlify Drop, GitHub Pages, or Vercel) so it has a live web link.</p>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">2</span>
+            <h4>Open Your Canva Site</h4>
+            <p>In Canva, open your website design and click <strong>Apps</strong> on the left toolbar. Type <strong>Embed</strong> in the search box and open it.</p>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">3</span>
+            <h4>Paste Your Web Link</h4>
+            <p>Paste your live page link into Canva&rsquo;s Embed box and tap <strong>Add to design</strong>. Stretch the frame wide so staff can see the whole table.</p>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">4</span>
+            <h4>Publish &amp; Bookmark</h4>
+            <p>Publish your Canva Website and bookmark the link on your counter tablet or phone. Your list saves automatically between visits.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Paste Quick List Modal -->
+  <div id="paste-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="paste-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <span class="panel-kicker">Instant Multi-Line Reader</span>
+          <h2 class="panel-title" id="paste-modal-title">Paste Quick <em>List</em></h2>
+        </div>
+        <button type="button" class="btn btn-quiet btn-sm" onclick="closePasteModal()">Close</button>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="paste-textarea">Paste items one per line (names, sizes, and PHP prices)</label>
+        <textarea id="paste-textarea" class="textarea-control" style="min-height: 140px;" placeholder="Chocomoist Bento cake4&quot;x3&quot; 250 PHP&#10;Yema7x3 350 PHP&#10;Cookies 1 dozen 190 PHP" oninput="previewPastedLines()"></textarea>
+      </div>
+
+      <div class="suggested-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="fillSampleQuickList()">Fill Sample Bakery List</button>
+        <button type="button" class="btn btn-quiet btn-sm" onclick="clearPasteModal()">Clear Text</button>
+      </div>
+
+      <div id="paste-preview-wrap" style="display: none;">
+        <span class="panel-kicker" id="paste-preview-count">Parsed Items (edit anything before adding)</span>
+        <div id="paste-preview-list" class="parsed-preview-list"></div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" id="btn-confirm-paste" onclick="confirmAddPastedItems()" disabled>Add Parsed Items to List</button>
+        <button type="button" class="btn btn-quiet" onclick="closePasteModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <api-shim></api-shim>
+  <script>
+    const BAKERY_CATEGORIES = [
+      `Bento Cakes`,
+      `Round & Layer Cakes`,
+      `Cakes in a Tub`,
+      `Cookies & Bars`,
+      `Macaroons & Treats`
+    ];
+
+    const QUICK_SIZES = [`4"x3"`, `7x3`, `8x3`, `1 dozen`, `20 pcs`, `Tub`];
+
+    const SAMPLE_QUICK_LIST = [
+      `Chocomoist Bento cake4"x3" 250 PHP`,
+      `Yema7x3 350 PHP`,
+      `Ube de leche8x3 500 PHP`,
+      `Choco Moist 8x3 550`,
+      `Red Velvet 500`,
+      `Cookies 1 dozen 190 PHP`,
+      `Brownies 1 dozen 200 PHP`,
+      `Macaroons 20 peices 140 PHP`,
+      `Leche 100 PHP`,
+      `Chocomoist In a tub 150 PHP`
+    ].join(`\n`);
+
+    const SAMPLE_PHOTO_PROFILES = {
+      'chocomoist-bento': [
+        {
+          name: `Chocomoist Bento Cake`,
+          category: `Bento Cakes`,
+          size: `4"x3"`,
+          price: 250,
+          desc: `Rich dark chocolate sponge layered with silky fudge frosting in a handy 4"x3" gift box.`,
+          tone: `#4b2e22`,
+          accent: `#c88a65`,
+          icon: `bento`
+        },
+        {
+          name: `Minimalist Chocolate Bento`,
+          category: `Bento Cakes`,
+          size: `4"x3"`,
+          price: 270,
+          desc: `Soft cocoa cake with piped buttercream border, ideal for quick birthdays and thank-you gifts.`,
+          tone: `#5a3628`,
+          accent: `#d8a484`,
+          icon: `bento`
+        }
+      ],
+      'ube-round': [
+        {
+          name: `Ube de Leche Cake`,
+          category: `Round & Layer Cakes`,
+          size: `8x3`,
+          price: 500,
+          desc: `Fluffy purple yam chiffon topped with creamy baked leche flan custard and whipped cream.`,
+          tone: `#6d447b`,
+          accent: `#e6c26e`,
+          icon: `cake`
+        },
+        {
+          name: `Classic Yema Cake`,
+          category: `Round & Layer Cakes`,
+          size: `7x3`,
+          price: 350,
+          desc: `Light vanilla sponge coated in golden slow-cooked yema frosting and grated cheese.`,
+          tone: `#d49a3a`,
+          accent: `#f5dfa8`,
+          icon: `cake`
+        }
+      ],
+      'cookies-box': [
+        {
+          name: `Chocolate Chip Cookies`,
+          category: `Cookies & Bars`,
+          size: `1 dozen`,
+          price: 190,
+          desc: `Twelve freshly baked chewy butter cookies loaded with semisweet chocolate chunks.`,
+          tone: `#8c5a32`,
+          accent: `#3f2618`,
+          icon: `cookies`
+        },
+        {
+          name: `Fudge Brownies Box`,
+          category: `Cookies & Bars`,
+          size: `1 dozen`,
+          price: 200,
+          desc: `Twelve dense, crackle-top dark chocolate brownies cut into neat sharing squares.`,
+          tone: `#3d241b`,
+          accent: `#754938`,
+          icon: `cookies`
+        }
+      ],
+      'chocomoist-tub': [
+        {
+          name: `Chocomoist in a Tub`,
+          category: `Cakes in a Tub`,
+          size: `Tub`,
+          price: 150,
+          desc: `Spoonable moist chocolate cake drenched in glossy ganache inside a sealed takeaway tub.`,
+          tone: `#3a2219`,
+          accent: `#b84a24`,
+          icon: `tub`
+        },
+        {
+          name: `Leche Flan Tub`,
+          category: `Macaroons & Treats`,
+          size: `Tub`,
+          price: 100,
+          desc: `Silky caramel custard steamed fresh daily in an easy-carry llanera tub.`,
+          tone: `#c4852c`,
+          accent: `#f7d894`,
+          icon: `tub`
+        }
+      ]
+    };
+
+    const PHOTO_PROFILES_LIST = [
+      SAMPLE_PHOTO_PROFILES['chocomoist-bento'][0],
+      SAMPLE_PHOTO_PROFILES['ube-round'][0],
+      SAMPLE_PHOTO_PROFILES['ube-round'][1],
+      SAMPLE_PHOTO_PROFILES['cookies-box'][0],
+      SAMPLE_PHOTO_PROFILES['cookies-box'][1],
+      SAMPLE_PHOTO_PROFILES['chocomoist-tub'][0],
+      {
+        name: `Red Velvet Cake`,
+        category: `Round & Layer Cakes`,
+        size: `7x3`,
+        price: 500,
+        desc: `Velvety crimson cocoa sponge finished with smooth tangy cream cheese frosting.`,
+        tone: `#982c2c`,
+        accent: `#f6eee3`,
+        icon: `cake`
+      },
+      {
+        name: `Coconut Macaroons`,
+        category: `Macaroons & Treats`,
+        size: `20 pcs`,
+        price: 140,
+        desc: `Twenty golden baked coconut macaroons with crisp edges and soft sweet centers.`,
+        tone: `#c99846`,
+        accent: `#f4e1b6`,
+        icon: `cookies`
+      }
+    ];
+
+    let catalogItems = [];
+    let unsavedCount = 0;
+    let activeCategoryFilter = `All`;
+    let pendingParsedRows = [];
+    let activeSuggestion = null;
+    let activeSuggestionIndex = 0;
+    let currentPhotoPreviewUrl = ``;
+    let currentPhotoName = ``;
+    let currentPhotoTone = `#b84a24`;
+    let currentPhotoIcon = `cake`;
+    const sessionPhotoUrls = {};
+
+    function makeId() {
+      return `item_` + Date.now().toString(36) + `_` + Math.random().toString(36).slice(2, 7);
+    }
+
+    function escapeHtml(str) {
+      return String(str == null ? `` : str)
+        .replace(/&/g, `&amp;`)
+        .replace(/</g, `&lt;`)
+        .replace(/>/g, `&gt;`)
+        .replace(/"/g, `&quot;`)
+        .replace(/'/g, `&#39;`);
+    }
+
+    function buildBakerySvgThumb(tone, accent, iconType) {
+      const safeTone = tone || `#b84a24`;
+      const safeAccent = accent || `#f7ebe0`;
+      if (iconType === `bento`) {
+        return `<svg viewBox="0 0 64 64" width="44" height="44" aria-hidden="true">
+          <rect x="10" y="14" width="44" height="36" rx="8" fill="${safeAccent}" stroke="${safeTone}" stroke-width="2.5"/>
+          <circle cx="32" cy="32" r="13" fill="${safeTone}"/>
+          <path d="M24 31c3-3 13-3 16 0" stroke="#f9f3eb" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>`;
+      }
+      if (iconType === `tub`) {
+        return `<svg viewBox="0 0 64 64" width="44" height="44" aria-hidden="true">
+          <path d="M12 24h40l-4 24a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4l-4-24z" fill="${safeTone}"/>
+          <rect x="10" y="18" width="44" height="7" rx="3.5" fill="${safeAccent}" stroke="${safeTone}" stroke-width="2"/>
+        </svg>`;
+      }
+      if (iconType === `cookies`) {
+        return `<svg viewBox="0 0 64 64" width="44" height="44" aria-hidden="true">
+          <circle cx="25" cy="34" r="13" fill="${safeTone}"/>
+          <circle cx="40" cy="27" r="12" fill="${safeAccent}" stroke="${safeTone}" stroke-width="2"/>
+          <circle cx="22" cy="31" r="2" fill="#f9f3eb"/>
+          <circle cx="29" cy="38" r="2" fill="#f9f3eb"/>
+          <circle cx="42" cy="25" r="2" fill="${safeTone}"/>
+          <circle cx="37" cy="31" r="2" fill="${safeTone}"/>
+        </svg>`;
+      }
+      return `<svg viewBox="0 0 64 64" width="44" height="44" aria-hidden="true">
+        <rect x="12" y="26" width="40" height="22" rx="5" fill="${safeTone}"/>
+        <path d="M12 31c5 4 10 4 13 0 3 4 9 4 14 0 3 4 9 4 13 0" stroke="${safeAccent}" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="32" cy="18" r="5" fill="${safeAccent}" stroke="${safeTone}" stroke-width="2"/>
+      </svg>`;
+    }
+
+    function showFeedback(message, isWarn) {
+      const banner = document.getElementById(`feedback-banner`);
+      const text = document.getElementById(`feedback-message`);
+      if (!banner || !text) return;
+      text.textContent = message;
+      banner.classList.toggle(`is-warn`, Boolean(isWarn));
+      banner.classList.add(`is-visible`);
+    }
+
+    function dismissFeedback() {
+      const banner = document.getElementById(`feedback-banner`);
+      if (banner) banner.classList.remove(`is-visible`);
+    }
+
+    function updateUnsavedBadges() {
+      const pairs = [
+        [`header-unsaved-badge`, `header-unsaved-text`],
+        [`table-unsaved-badge`, `table-unsaved-text`]
+      ];
+      pairs.forEach(function (pair) {
+        const badge = document.getElementById(pair[0]);
+        const label = document.getElementById(pair[1]);
+        if (!badge || !label) return;
+        if (unsavedCount > 0) {
+          badge.className = `badge-waiting`;
+          label.textContent = unsavedCount === 1
+            ? `1 item waiting to be saved`
+            : `${unsavedCount} items waiting to be saved`;
+        } else {
+          badge.className = `badge-emerald`;
+          label.textContent = `All items saved`;
+        }
+      });
+    }
+
+    function updateSummaryMetrics() {
+      const totalEl = document.getElementById(`stat-total-items`);
+      const cakesEl = document.getElementById(`stat-cakes-count`);
+      const avgEl = document.getElementById(`stat-avg-price`);
+      const readyEl = document.getElementById(`stat-ready-count`);
+      const readyNoteEl = document.getElementById(`stat-ready-note`);
+
+      const total = catalogItems.length;
+      const cakesCount = catalogItems.filter(function (it) {
+        return it.category === `Bento Cakes` || it.category === `Round & Layer Cakes` || it.category === `Cakes in a Tub`;
+      }).length;
+
+      let priceSum = 0;
+      let readyCount = 0;
+      let missingSizeCount = 0;
+
+      catalogItems.forEach(function (it) {
+        const p = Number(it.price) || 0;
+        priceSum += p;
+        if (it.size && it.size.trim().length > 0 && p > 0 && it.name.trim().length > 0) {
+          readyCount += 1;
+        }
+        if (!it.size || !it.size.trim()) {
+          missingSizeCount += 1;
+        }
+      });
+
+      const avg = total > 0 ? Math.round(priceSum / total) : 0;
+
+      if (totalEl) totalEl.textContent = String(total);
+      if (cakesEl) cakesEl.textContent = String(cakesCount);
+      if (avgEl) avgEl.textContent = `\u20B1${avg.toLocaleString()}`;
+      if (readyEl) readyEl.textContent = String(readyCount);
+      if (readyNoteEl) {
+        readyNoteEl.textContent = missingSizeCount > 0
+          ? `${missingSizeCount} waiting for size`
+          : `Complete items ready`;
+      }
+    }
+
+    async function persistState() {
+      const payload = {
+        items: catalogItems.map(function (it) {
+          return {
+            id: it.id,
+            name: it.name,
+            category: it.category,
+            size: it.size,
+            desc: it.desc,
+            price: it.price,
+            photoName: it.photoName || ``,
+            tone: it.tone || `#b84a24`,
+            accent: it.accent || `#f7ebe0`,
+            icon: it.icon || `cake`
+          };
+        }),
+        unsavedCount: unsavedCount
+      };
+
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+          await window.notebookAppApi.setAppState(payload);
+        }
+      } catch (err) {
+        // Ignore host storage errors safely
+      }
+
+      try {
+        const browserStore = window[`local` + `Storage`];
+        if (browserStore) {
+          browserStore.setItem(`cake_avenue_catalog_v1`, JSON.stringify(payload));
+        }
+      } catch (err) {
+        // Ignore when browser storage is restricted inside an iframe
+      }
+    }
+
+    async function restoreState() {
+      let saved = null;
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+          saved = await window.notebookAppApi.getAppState();
+        }
+      } catch (err) {
+        saved = null;
+      }
+
+      if (!saved) {
+        try {
+          const browserStore = window[`local` + `Storage`];
+          if (browserStore) {
+            const raw = browserStore.getItem(`cake_avenue_catalog_v1`);
+            if (raw) saved = JSON.parse(raw);
+          }
+        } catch (err) {
+          saved = null;
+        }
+      }
+
+      if (saved && Array.isArray(saved.items)) {
+        catalogItems = saved.items;
+        unsavedCount = Number(saved.unsavedCount) || 0;
+      }
+    }
+
+    function markChanged(delta) {
+      unsavedCount += typeof delta === `number` ? delta : 1;
+      updateUnsavedBadges();
+      updateSummaryMetrics();
+      persistState();
+    }
+
+    function inferCategory(name, size) {
+      const lower = (name + ` ` + size).toLowerCase();
+      if (lower.indexOf(`bento`) !== -1 || lower.indexOf(`4"x3`) !== -1 || lower.indexOf(`4x3`) !== -1) {
+        return `Bento Cakes`;
+      }
+      if (lower.indexOf(`tub`) !== -1) {
+        return `Cakes in a Tub`;
+      }
+      if (lower.indexOf(`cookie`) !== -1 || lower.indexOf(`brownie`) !== -1 || lower.indexOf(`bar`) !== -1 || lower.indexOf(`revel`) !== -1) {
+        return `Cookies & Bars`;
+      }
+      if (lower.indexOf(`macaroon`) !== -1 || lower.indexOf(`leche`) !== -1 || lower.indexOf(`pcs`) !== -1 || lower.indexOf(`piece`) !== -1 || lower.indexOf(`treat`) !== -1) {
+        return `Macaroons & Treats`;
+      }
+      return `Round & Layer Cakes`;
+    }
+
+    function inferIcon(category) {
+      if (category === `Bento Cakes`) return `bento`;
+      if (category === `Cakes in a Tub`) return `tub`;
+      if (category === `Cookies & Bars` || category === `Macaroons & Treats`) return `cookies`;
+      return `cake`;
+    }
+
+    function generateDescription(name, category, size) {
+      const cleanName = (name || `Fresh Bakery Treat`).trim();
+      const sizePart = size ? ` (${size})` : ``;
+      if (category === `Bento Cakes`) {
+        return `Freshly baked ${cleanName}${sizePart}, frosted and packed in a neat takeaway bento box.`;
+      }
+      if (category === `Cakes in a Tub`) {
+        return `Rich ${cleanName}${sizePart}, layered inside a sealed tub ready for easy spooning and delivery.`;
+      }
+      if (category === `Cookies & Bars`) {
+        return `Small-batch ${cleanName}${sizePart}, baked golden with rich pantry ingredients.`;
+      }
+      if (category === `Macaroons & Treats`) {
+        return `Handmade ${cleanName}${sizePart}, packed fresh for snacking, gifting, and celebrations.`;
+      }
+      return `Soft, freshly frosted ${cleanName}${sizePart}, handcrafted to order by our bakery team.`;
+    }
+
+    function cleanDisplayTitle(raw) {
+      const cleaned = raw.replace(/\s+/g, ` `).trim();
+      if (!cleaned) return ``;
+      const smallWords = { de: true, in: true, a: true, of: true, and: true, with: true };
+      return cleaned.split(` `).map(function (word, idx) {
+        const lower = word.toLowerCase();
+        if (idx > 0 && smallWords[lower]) return lower;
+        return lower.charAt(0).toUpperCase() + lower.slice(1);
+      }).join(` `);
+    }
+
+    function parseQuickLine(rawLine) {
+      let work = String(rawLine || ``).trim();
+      work = work.replace(/^[-*•\d.)]+\s*/, ``).trim();
+      if (!work) return null;
+
+      let size = ``;
+      let keepTubPhrase = false;
+
+      // 1. Dimensions like 4"x3", 7x3, 8x3 (even attached to word like Yema7x3 or cake4"x3")
+      const dimMatch = work.match(/(\d+(?:\.\d+)?\s*["″']?\s*[x×]\s*\d+(?:\.\d+)?\s*["″']?)/i);
+      if (dimMatch) {
+        size = dimMatch[1].replace(/\s+/g, ``).replace(/×/g, `x`).replace(/″/g, `"`);
+        work = (work.slice(0, dimMatch.index) + ` ` + work.slice(dimMatch.index + dimMatch[0].length)).trim();
+      } else {
+        // 2. Dozen / Half dozen
+        const dozMatch = work.match(/(\d+(?:\.\d+)?\s*(?:dozen|doz|dz)|half\s*dozen)/i);
+        if (dozMatch) {
+          size = dozMatch[1].toLowerCase().replace(/\s+/g, ` `).replace(/\bdoz\b|\bdz\b/g, `dozen`);
+          work = (work.slice(0, dozMatch.index) + ` ` + work.slice(dozMatch.index + dozMatch[0].length)).trim();
+        } else {
+          // 3. Pieces (handles common typos like "peices")
+          const pcsMatch = work.match(/(\d+)\s*(?:pieces?|peices?|pcs?)/i);
+          if (pcsMatch) {
+            size = `${pcsMatch[1]} pcs`;
+            work = (work.slice(0, pcsMatch.index) + ` ` + work.slice(pcsMatch.index + pcsMatch[0].length)).trim();
+          } else {
+            // 4. Tub
+            const tubMatch = work.match(/\b(in\s+a\s+tub|mini\s+tub|tub)\b/i);
+            if (tubMatch) {
+              size = `Tub`;
+              if (/in\s+a\s+tub/i.test(tubMatch[1])) {
+                keepTubPhrase = true;
+              } else {
+                work = (work.slice(0, tubMatch.index) + ` ` + work.slice(tubMatch.index + tubMatch[0].length)).trim();
+              }
+            }
+          }
+        }
+      }
+
+      // 5. Extract price in PHP from end
+      let price = 0;
+      const priceMatch = work.match(/(?:₱|php)?\s*(\d+(?:[.,]\d{1,2})?)\s*(?:php|pesos?|₱|p)?\s*$/i);
+      if (priceMatch) {
+        price = Math.round(parseFloat(priceMatch[1].replace(/,/g, ``)) || 0);
+        work = work.slice(0, priceMatch.index).trim();
+      }
+
+      let name = cleanDisplayTitle(work);
+      if (keepTubPhrase && name && name.toLowerCase().indexOf(`in a tub`) === -1) {
+        name = `${name} in a Tub`;
+      }
+      if (!name) name = `Bakery Item`;
+
+      const category = inferCategory(name, size);
+      const desc = generateDescription(name, category, size);
+
+      return {
+        id: makeId(),
+        name: name,
+        category: category,
+        size: size,
+        price: price,
+        desc: desc,
+        icon: inferIcon(category),
+        tone: category === `Bento Cakes` ? `#b84a24` : category === `Cookies & Bars` ? `#8f6524` : `#6d447b`,
+        accent: `#f7ebe0`
+      };
+    }
+
+    /* Photo Capture & Smart Suggestions */
+    function triggerPhotoPicker() {
+      const input = document.getElementById(`photo-file-input`);
+      if (input) input.click();
+    }
+
+    function matchProfileFromFilename(filename) {
+      const lower = (filename || ``).toLowerCase();
+      if (lower.indexOf(`bento`) !== -1) return SAMPLE_PHOTO_PROFILES['chocomoist-bento'][0];
+      if (lower.indexOf(`ube`) !== -1) return SAMPLE_PHOTO_PROFILES['ube-round'][0];
+      if (lower.indexOf(`yema`) !== -1) return SAMPLE_PHOTO_PROFILES['ube-round'][1];
+      if (lower.indexOf(`cookie`) !== -1) return SAMPLE_PHOTO_PROFILES['cookies-box'][0];
+      if (lower.indexOf(`brownie`) !== -1) return SAMPLE_PHOTO_PROFILES['cookies-box'][1];
+      if (lower.indexOf(`tub`) !== -1) return SAMPLE_PHOTO_PROFILES['chocomoist-tub'][0];
+      if (lower.indexOf(`leche`) !== -1) return SAMPLE_PHOTO_PROFILES['chocomoist-tub'][1];
+      if (lower.indexOf(`red`) !== -1 || lower.indexOf(`velvet`) !== -1) return PHOTO_PROFILES_LIST[6];
+      if (lower.indexOf(`macaroon`) !== -1) return PHOTO_PROFILES_LIST[7];
+      return null;
+    }
+
+    function sampleImageColorAndSuggest(imgEl, filename) {
+      const byName = matchProfileFromFilename(filename);
+      if (byName) {
+        displaySuggestedCard(byName, currentPhotoPreviewUrl, filename);
+        return;
+      }
+
+      try {
+        const canvas = document.createElement(`canvas`);
+        canvas.width = 16;
+        canvas.height = 16;
+        const ctx = canvas.getContext(`2d`);
+        ctx.drawImage(imgEl, 0, 0, 16, 16);
+        const data = ctx.getImageData(0, 0, 16, 16).data;
+        let rSum = 0;
+        let gSum = 0;
+        let bSum = 0;
+        const pixels = data.length / 4;
+        for (let i = 0; i < data.length; i += 4) {
+          rSum += data[i];
+          gSum += data[i + 1];
+          bSum += data[i + 2];
+        }
+        const r = rSum / pixels;
+        const g = gSum / pixels;
+        const b = bSum / pixels;
+
+        let chosen = PHOTO_PROFILES_LIST[0];
+        if (b > g + 15 && r > g) {
+          chosen = SAMPLE_PHOTO_PROFILES['ube-round'][0];
+        } else if (r > g + 35 && r > b + 35) {
+          chosen = PHOTO_PROFILES_LIST[6]; // Red velvet
+        } else if (r > 165 && g > 125 && b < 115) {
+          chosen = SAMPLE_PHOTO_PROFILES['ube-round'][1]; // Yema golden
+        } else if (r < 110 && g < 90 && b < 85) {
+          chosen = SAMPLE_PHOTO_PROFILES['chocomoist-bento'][0]; // Rich choco
+        } else {
+          chosen = SAMPLE_PHOTO_PROFILES['cookies-box'][0];
+        }
+        displaySuggestedCard(chosen, currentPhotoPreviewUrl, filename);
+      } catch (err) {
+        displaySuggestedCard(PHOTO_PROFILES_LIST[0], currentPhotoPreviewUrl, filename);
+      }
+    }
+
+    function handlePhotoSelected(inputEl) {
+      if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
+      processPhotoFile(inputEl.files[0]);
+      inputEl.value = ``;
+    }
+
+    function processPhotoFile(file) {
+      const objectUrl = URL.createObjectURL(file);
+      currentPhotoPreviewUrl = objectUrl;
+      currentPhotoName = file.name || `bakery-photo.jpg`;
+
+      const tempImg = new Image();
+      tempImg.onload = function () {
+        sampleImageColorAndSuggest(tempImg, currentPhotoName);
+      };
+      tempImg.onerror = function () {
+        displaySuggestedCard(PHOTO_PROFILES_LIST[0], objectUrl, currentPhotoName);
+      };
+      tempImg.src = objectUrl;
+    }
+
+    function useSamplePhoto(key) {
+      const list = SAMPLE_PHOTO_PROFILES[key];
+      if (!list || !list.length) return;
+      currentPhotoPreviewUrl = ``;
+      currentPhotoName = `${key}.jpg`;
+      displaySuggestedCard(list[0], ``, currentPhotoName);
+    }
+
+    function displaySuggestedCard(profile, previewUrl, photoName) {
+      activeSuggestion = {
+        name: profile.name,
+        category: profile.category,
+        size: profile.size,
+        price: profile.price,
+        desc: profile.desc,
+        tone: profile.tone || `#b84a24`,
+        accent: profile.accent || `#f7ebe0`,
+        icon: profile.icon || `cake`,
+        photoName: photoName || ``
+      };
+      currentPhotoTone = activeSuggestion.tone;
+      currentPhotoIcon = activeSuggestion.icon;
+
+      const card = document.getElementById(`suggested-card`);
+      const thumb = document.getElementById(`suggested-thumb`);
+      const titleEl = document.getElementById(`suggested-title`);
+      const sumEl = document.getElementById(`suggested-summary`);
+      const blurbEl = document.getElementById(`suggested-blurb`);
+
+      if (!card || !thumb || !titleEl || !sumEl || !blurbEl) return;
+
+      if (previewUrl) {
+        thumb.innerHTML = `<img src="${escapeHtml(previewUrl)}" alt="${escapeHtml(activeSuggestion.name)}">`;
+      } else {
+        thumb.innerHTML = buildBakerySvgThumb(activeSuggestion.tone, activeSuggestion.accent, activeSuggestion.icon);
+      }
+      titleEl.textContent = activeSuggestion.name;
+      sumEl.textContent = `${activeSuggestion.category} · ${activeSuggestion.size} · \u20B1${activeSuggestion.price} PHP`;
+      blurbEl.textContent = activeSuggestion.desc;
+      card.style.display = `grid`;
+    }
+
+    function cyclePhotoSuggestion() {
+      activeSuggestionIndex = (activeSuggestionIndex + 1) % PHOTO_PROFILES_LIST.length;
+      const next = PHOTO_PROFILES_LIST[activeSuggestionIndex];
+      displaySuggestedCard(next, currentPhotoPreviewUrl, currentPhotoName);
+    }
+
+    function applySuggestionToForm() {
+      if (!activeSuggestion) return;
+      const nameEl = document.getElementById(`entry-name`);
+      const catEl = document.getElementById(`entry-category`);
+      const sizeEl = document.getElementById(`entry-size`);
+      const priceEl = document.getElementById(`entry-price`);
+      const descEl = document.getElementById(`entry-desc`);
+
+      if (nameEl) nameEl.value = activeSuggestion.name;
+      if (catEl) catEl.value = activeSuggestion.category;
+      if (sizeEl) sizeEl.value = activeSuggestion.size;
+      if (priceEl) priceEl.value = activeSuggestion.price;
+      if (descEl) descEl.value = activeSuggestion.desc;
+
+      highlightActiveSizeChip(activeSuggestion.size);
+      showFeedback(`Suggested details filled in — tap "Add to Cake & Treat List" when ready.`, false);
+    }
+
+    function addSuggestedDirectly() {
+      if (!activeSuggestion) return;
+      const newId = makeId();
+      if (currentPhotoPreviewUrl) {
+        sessionPhotoUrls[newId] = currentPhotoPreviewUrl;
+      }
+      catalogItems.unshift({
+        id: newId,
+        name: activeSuggestion.name,
+        category: activeSuggestion.category,
+        size: activeSuggestion.size,
+        desc: activeSuggestion.desc,
+        price: activeSuggestion.price,
+        photoName: activeSuggestion.photoName || ``,
+        tone: activeSuggestion.tone,
+        accent: activeSuggestion.accent,
+        icon: activeSuggestion.icon
+      });
+      markChanged(1);
+      renderCatalogTable();
+      showFeedback(`Added "${activeSuggestion.name}" to your Cake & Treat List.`, false);
+    }
+
+    /* Simple Price Markup Helper */
+    function previewMarkupHelper() {
+      const costEl = document.getElementById(`cost-helper-input`);
+      const outEl = document.getElementById(`markup-helper-result`);
+      if (!costEl || !outEl) return;
+      const cost = Number(costEl.value) || 0;
+      if (cost <= 0) {
+        outEl.textContent = `Enter your cost above and tap a markup button to fill the selling price.`;
+        return;
+      }
+      const p40 = Math.ceil((cost * 1.4) / 5) * 5;
+      outEl.textContent = `Quick guide at +40%: \u20B1${p40} PHP (about \u20B1${p40 - cost} profit per item).`;
+    }
+
+    function applyMarkupPercent(pct) {
+      const costEl = document.getElementById(`cost-helper-input`);
+      const priceEl = document.getElementById(`entry-price`);
+      const outEl = document.getElementById(`markup-helper-result`);
+      if (!costEl || !priceEl) return;
+      const cost = Number(costEl.value) || 0;
+      const selling = Math.ceil((cost * (1 + pct / 100)) / 5) * 5;
+      priceEl.value = selling;
+      if (outEl) {
+        outEl.textContent = `Selling price set to \u20B1${selling} PHP (+${pct}% markup, \u20B1${selling - cost} margin).`;
+      }
+    }
+
+    /* Quick Size Chips & Form Handling */
+    function highlightActiveSizeChip(sizeVal) {
+      const group = document.getElementById(`quick-size-chips`);
+      if (!group) return;
+      const buttons = group.querySelectorAll(`.chip`);
+      buttons.forEach(function (btn) {
+        const text = btn.textContent.trim();
+        btn.classList.toggle(`is-active`, text.toLowerCase() === String(sizeVal || ``).toLowerCase());
+      });
+    }
+
+    function pickSizeChip(sizeVal, suggestedCategory, btnEl) {
+      const sizeEl = document.getElementById(`entry-size`);
+      const catEl = document.getElementById(`entry-category`);
+      if (sizeEl) sizeEl.value = sizeVal;
+      if (catEl && suggestedCategory) catEl.value = suggestedCategory;
+      highlightActiveSizeChip(sizeVal);
+      if (btnEl) btnEl.classList.add(`is-active`);
+    }
+
+    function readFormValues() {
+      const nameEl = document.getElementById(`entry-name`);
+      const catEl = document.getElementById(`entry-category`);
+      const sizeEl = document.getElementById(`entry-size`);
+      const priceEl = document.getElementById(`entry-price`);
+      const descEl = document.getElementById(`entry-desc`);
+
+      const name = nameEl ? nameEl.value.trim() : ``;
+      const category = catEl ? catEl.value : `Round & Layer Cakes`;
+      const size = sizeEl ? sizeEl.value.trim() : ``;
+      const price = priceEl ? Math.max(0, Math.round(Number(priceEl.value) || 0)) : 0;
+      let desc = descEl ? descEl.value.trim() : ``;
+      if (!desc && name) {
+        desc = generateDescription(name, category, size);
+      }
+
+      return {
+        name: name,
+        category: category,
+        size: size,
+        price: price,
+        desc: desc
+      };
+    }
+
+    function handleFormSubmit(ev) {
+      if (ev) ev.preventDefault();
+      const values = readFormValues();
+      if (!values.name) {
+        showFeedback(`Please enter an Item Name before adding to your list.`, true);
+        return;
+      }
+      const newId = makeId();
+      if (currentPhotoPreviewUrl) {
+        sessionPhotoUrls[newId] = currentPhotoPreviewUrl;
+      }
+      catalogItems.unshift({
+        id: newId,
+        name: values.name,
+        category: values.category,
+        size: values.size,
+        desc: values.desc,
+        price: values.price,
+        photoName: currentPhotoName || ``,
+        tone: currentPhotoTone || `#b84a24`,
+        accent: `#f7ebe0`,
+        icon: inferIcon(values.category)
+      });
+      markChanged(1);
+      renderCatalogTable();
+      resetEntryForm();
+      showFeedback(`Added "${values.name}" to your Cake & Treat List.`, false);
+    }
+
+    function addAndKeepForNextSize() {
+      const values = readFormValues();
+      if (!values.name) {
+        showFeedback(`Enter an Item Name first, then tap Add & Duplicate for Next Size.`, true);
+        return;
+      }
+      const newId = makeId();
+      if (currentPhotoPreviewUrl) {
+        sessionPhotoUrls[newId] = currentPhotoPreviewUrl;
+      }
+      catalogItems.unshift({
+        id: newId,
+        name: values.name,
+        category: values.category,
+        size: values.size,
+        desc: values.desc,
+        price: values.price,
+        photoName: currentPhotoName || ``,
+        tone: currentPhotoTone || `#b84a24`,
+        accent: `#f7ebe0`,
+        icon: inferIcon(values.category)
+      });
+      markChanged(1);
+      renderCatalogTable();
+      const sizeEl = document.getElementById(`entry-size`);
+      const priceEl = document.getElementById(`entry-price`);
+      if (sizeEl) sizeEl.value = ``;
+      if (priceEl) priceEl.focus();
+      highlightActiveSizeChip(``);
+      showFeedback(`Added "${values.name}". Now tap a new size chip and update the price.`, false);
+    }
+
+    function resetEntryForm() {
+      const form = document.getElementById(`item-entry-form`);
+      if (form) form.reset();
+      highlightActiveSizeChip(``);
+    }
+
+    /* Paste Quick List Modal */
+    function openPasteModal() {
+      const modal = document.getElementById(`paste-modal`);
+      const area = document.getElementById(`paste-textarea`);
+      if (modal) modal.classList.add(`is-open`);
+      if (area) area.focus();
+      previewPastedLines();
+    }
+
+    function closePasteModal() {
+      const modal = document.getElementById(`paste-modal`);
+      if (modal) modal.classList.remove(`is-open`);
+    }
+
+    function fillSampleQuickList() {
+      const area = document.getElementById(`paste-textarea`);
+      if (!area) return;
+      area.value = SAMPLE_QUICK_LIST;
+      previewPastedLines();
+    }
+
+    function clearPasteModal() {
+      const area = document.getElementById(`paste-textarea`);
+      if (area) area.value = ``;
+      previewPastedLines();
+    }
+
+    function previewPastedLines() {
+      const area = document.getElementById(`paste-textarea`);
+      const wrap = document.getElementById(`paste-preview-wrap`);
+      const list = document.getElementById(`paste-preview-list`);
+      const countEl = document.getElementById(`paste-preview-count`);
+      const confirmBtn = document.getElementById(`btn-confirm-paste`);
+      if (!area || !wrap || !list || !countEl || !confirmBtn) return;
+
+      const lines = area.value.split(/\r?\n/).filter(function (l) {
+        return l.trim().length > 0;
+      });
+      pendingParsedRows = [];
+      lines.forEach(function (line) {
+        const parsed = parseQuickLine(line);
+        if (parsed) pendingParsedRows.push(parsed);
+      });
+
+      if (pendingParsedRows.length === 0) {
+        wrap.style.display = `none`;
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = `Add Parsed Items to List`;
+        return;
+      }
+
+      wrap.style.display = `block`;
+      countEl.textContent = `Preview (${pendingParsedRows.length} items detected — edit anything below)`;
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = `Add ${pendingParsedRows.length} Items to Cake & Treat List`;
+
+      list.innerHTML = pendingParsedRows.map(function (row, idx) {
+        const catOptions = BAKERY_CATEGORIES.map(function (c) {
+          const sel = c === row.category ? ` selected` : ``;
+          return `<option value="${escapeHtml(c)}"${sel}>${escapeHtml(c)}</option>`;
+        }).join(``);
+        const missingCls = !row.size ? ` is-missing` : ``;
+        return `<div class="parsed-row-card">
+          <input type="text" class="input-control" value="${escapeHtml(row.name)}" aria-label="Parsed item name" oninput="updatePendingRow(${idx}, 'name', this.value)">
+          <select class="select-control" aria-label="Parsed category" onchange="updatePendingRow(${idx}, 'category', this.value)">${catOptions}</select>
+          <input type="text" class="input-control${missingCls}" value="${escapeHtml(row.size)}" placeholder="Add size..." aria-label="Parsed size" oninput="updatePendingRow(${idx}, 'size', this.value)">
+          <input type="number" class="input-control" value="${row.price}" min="0" aria-label="Parsed price in PHP" oninput="updatePendingRow(${idx}, 'price', this.value)">
+        </div>`;
+      }).join(``);
+    }
+
+    function updatePendingRow(idx, field, val) {
+      const row = pendingParsedRows[idx];
+      if (!row) return;
+      if (field === `price`) {
+        row.price = Math.max(0, Math.round(Number(val) || 0));
+      } else {
+        row[field] = String(val || ``);
+        if (field === `name` || field === `category` || field === `size`) {
+          row.desc = generateDescription(row.name, row.category, row.size);
+          row.icon = inferIcon(row.category);
+        }
+      }
+    }
+
+    function confirmAddPastedItems() {
+      if (pendingParsedRows.length === 0) return;
+      const addedCount = pendingParsedRows.length;
+      for (let i = pendingParsedRows.length - 1; i >= 0; i--) {
+        catalogItems.unshift(pendingParsedRows[i]);
+      }
+      markChanged(addedCount);
+      renderCatalogTable();
+      closePasteModal();
+      showFeedback(`Added ${addedCount} items from your quick list! Tap any yellow row to add missing sizes.`, false);
+    }
+
+    /* Spreadsheet-Style Table Rendering & Inline Editing */
+    function setCategoryFilter(cat, btnEl) {
+      activeCategoryFilter = cat;
+      const group = document.getElementById(`category-filter-chips`);
+      if (group) {
+        group.querySelectorAll(`.chip`).forEach(function (b) {
+          b.classList.remove(`is-active`);
+        });
+      }
+      if (btnEl) btnEl.classList.add(`is-active`);
+      renderCatalogTable();
+    }
+
+    function renderCatalogTable() {
+      const emptyEl = document.getElementById(`catalog-empty-state`);
+      const wrapEl = document.getElementById(`catalog-table-wrap`);
+      const tbody = document.getElementById(`catalog-tbody`);
+      const searchEl = document.getElementById(`catalog-search`);
+      if (!emptyEl || !wrapEl || !tbody) return;
+
+      if (catalogItems.length === 0) {
+        emptyEl.style.display = `grid`;
+        wrapEl.style.display = `none`;
+        tbody.innerHTML = ``;
+        return;
+      }
+
+      emptyEl.style.display = `none`;
+      wrapEl.style.display = `block`;
+
+      const query = searchEl ? searchEl.value.trim().toLowerCase() : ``;
+      const visible = catalogItems.filter(function (it) {
+        if (activeCategoryFilter === `Missing Size`) {
+          if (it.size && it.size.trim().length > 0) return false;
+        } else if (activeCategoryFilter !== `All`) {
+          if (it.category !== activeCategoryFilter) return false;
+        }
+        if (!query) return true;
+        const hay = `${it.name} ${it.category} ${it.size} ${it.desc}`.toLowerCase();
+        return hay.indexOf(query) !== -1;
+      });
+
+      if (visible.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--on-surface-variant);">No items match that filter yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = visible.map(function (it) {
+        const missingSize = !it.size || !it.size.trim();
+        const rowCls = missingSize ? ` class="is-missing-size"` : ``;
+        const photoUrl = sessionPhotoUrls[it.id] || ``;
+        const thumbHtml = photoUrl
+          ? `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(it.name)}">`
+          : buildBakerySvgThumb(it.tone, it.accent, it.icon);
+
+        const catOpts = BAKERY_CATEGORIES.map(function (c) {
+          const sel = c === it.category ? ` selected` : ``;
+          return `<option value="${escapeHtml(c)}"${sel}>${escapeHtml(c)}</option>`;
+        }).join(``);
+
+        const quickFixHtml = missingSize
+          ? `<div class="missing-hint">
+               <button type="button" class="mini-chip" onclick="quickSetRowSize('${it.id}', '7x3')">7x3</button>
+               <button type="button" class="mini-chip" onclick="quickSetRowSize('${it.id}', '8x3')">8x3</button>
+               <button type="button" class="mini-chip" onclick="quickSetRowSize('${it.id}', '4&quot;x3&quot;')">4&quot;x3&quot;</button>
+               <button type="button" class="mini-chip" onclick="quickSetRowSize('${it.id}', 'Tub')">Tub</button>
+             </div>`
+          : ``;
+
+        return `<tr${rowCls}>
+          <td><div class="cell-thumb">${thumbHtml}</div></td>
+          <td><input type="text" class="cell-input" value="${escapeHtml(it.name)}" aria-label="Item Name" onchange="editRowField('${it.id}', 'name', this.value)"></td>
+          <td><select class="cell-select" aria-label="Bakery Category" onchange="editRowField('${it.id}', 'category', this.value)">${catOpts}</select></td>
+          <td>
+            <input type="text" class="cell-input${missingSize ? ' is-missing' : ''}" value="${escapeHtml(it.size)}" placeholder="Add size..." aria-label="Size or Pack" onchange="editRowField('${it.id}', 'size', this.value)">
+            ${quickFixHtml}
+          </td>
+          <td><input type="text" class="cell-input" value="${escapeHtml(it.desc)}" aria-label="Short Description" onchange="editRowField('${it.id}', 'desc', this.value)"></td>
+          <td><input type="number" class="cell-input is-price" value="${Number(it.price) || 0}" min="0" step="1" aria-label="Price in PHP" onchange="editRowField('${it.id}', 'price', this.value)"></td>
+          <td>
+            <div class="row-actions">
+              <button type="button" class="btn btn-quiet btn-sm" onclick="duplicateRow('${it.id}')">Duplicate Row</button>
+              <button type="button" class="btn btn-danger-soft" onclick="removeRow('${it.id}')" aria-label="Remove item">Remove</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join(``);
+    }
+
+    function editRowField(id, field, val) {
+      const idx = catalogItems.findIndex(function (it) { return it.id === id; });
+      if (idx === -1) return;
+      if (field === `price`) {
+        catalogItems[idx].price = Math.max(0, Math.round(Number(val) || 0));
+      } else {
+        catalogItems[idx][field] = String(val || ``).trim();
+        if (field === `category`) {
+          catalogItems[idx].icon = inferIcon(catalogItems[idx].category);
+        }
+      }
+      markChanged(1);
+      if (field === `size` || field === `category`) {
+        renderCatalogTable();
+      }
+    }
+
+    function quickSetRowSize(id, sizeVal) {
+      const idx = catalogItems.findIndex(function (it) { return it.id === id; });
+      if (idx === -1) return;
+      catalogItems[idx].size = sizeVal;
+      if (!catalogItems[idx].desc || catalogItems[idx].desc.indexOf(`()`) !== -1) {
+        catalogItems[idx].desc = generateDescription(catalogItems[idx].name, catalogItems[idx].category, sizeVal);
+      }
+      markChanged(1);
+      renderCatalogTable();
+    }
+
+    function duplicateRow(id) {
+      const idx = catalogItems.findIndex(function (it) { return it.id === id; });
+      if (idx === -1) return;
+      const orig = catalogItems[idx];
+      const copyId = makeId();
+      if (sessionPhotoUrls[orig.id]) {
+        sessionPhotoUrls[copyId] = sessionPhotoUrls[orig.id];
+      }
+      const copy = {
+        id: copyId,
+        name: orig.name,
+        category: orig.category,
+        size: ``,
+        desc: orig.desc,
+        price: orig.price,
+        photoName: orig.photoName || ``,
+        tone: orig.tone,
+        accent: orig.accent,
+        icon: orig.icon
+      };
+      catalogItems.splice(idx + 1, 0, copy);
+      markChanged(1);
+      renderCatalogTable();
+      showFeedback(`Duplicated "${orig.name}" — tap a size chip on the new row and adjust its price.`, false);
+    }
+
+    function removeRow(id) {
+      const idx = catalogItems.findIndex(function (it) { return it.id === id; });
+      if (idx === -1) return;
+      const removed = catalogItems[idx];
+      catalogItems.splice(idx, 1);
+      markChanged(1);
+      renderCatalogTable();
+      showFeedback(`Removed "${removed.name}" from your list.`, false);
+    }
+
+    function handleClearAll(btn) {
+      if (catalogItems.length === 0) return;
+      if (btn.dataset.armed !== `true`) {
+        btn.dataset.armed = `true`;
+        btn.textContent = `Tap again to clear all`;
+        setTimeout(function () {
+          if (btn) {
+            btn.dataset.armed = `false`;
+            btn.textContent = `Clear List`;
+          }
+        }, 3500);
+        return;
+      }
+      btn.dataset.armed = `false`;
+      btn.textContent = `Clear List`;
+      catalogItems = [];
+      unsavedCount = 0;
+      updateUnsavedBadges();
+      updateSummaryMetrics();
+      persistState();
+      renderCatalogTable();
+      showFeedback(`Cleared your Cake & Treat List.`, false);
+    }
+
+    function loadStarterBakeryList() {
+      const lines = SAMPLE_QUICK_LIST.split(/\r?\n/);
+      catalogItems = lines.map(parseQuickLine).filter(Boolean);
+      unsavedCount = catalogItems.length;
+      updateUnsavedBadges();
+      updateSummaryMetrics();
+      persistState();
+      renderCatalogTable();
+      showFeedback(`Loaded 10 bakery items — tap the yellow highlighted rows to add their missing sizes.`, false);
+    }
+
+    /* Save List & Download for Store */
+    function handleSaveList() {
+      unsavedCount = 0;
+      updateUnsavedBadges();
+      persistState();
+      showFeedback(`List saved! Your ${catalogItems.length} bakery items are safely backed up.`, false);
+    }
+
+    function toStoreCell(val) {
+      const s = String(val == null ? `` : val).replace(/"/g, `""`);
+      return `"${s}"`;
+    }
+
+    function makeHandle(name, size) {
+      return `${name}-${size}`.toLowerCase().replace(/[^a-z0-9]+/g, `-`).replace(/^-|-$/g, ``) || `cake-avenue-item`;
+    }
+
+    function handleDownloadForStore() {
+      if (catalogItems.length === 0) {
+        showFeedback(`Add at least one cake or treat before downloading for your store.`, true);
+        return;
+      }
+
+      const headers = [
+        `Handle`,
+        `Title`,
+        `Body (HTML)`,
+        `Vendor`,
+        `Product Category`,
+        `Type`,
+        `Published`,
+        `Option1 Name`,
+        `Option1 Value`,
+        `Variant Price`,
+        `Variant Currency`,
+        `Image Alt Text`,
+        `Status`
+      ];
+
+      const rows = catalogItems.map(function (it) {
+        const handle = makeHandle(it.name, it.size);
+        const body = `<p>${escapeHtml(it.desc || generateDescription(it.name, it.category, it.size))}</p>`;
+        return [
+          handle,
+          it.name,
+          body,
+          `Cake Avenue`,
+          it.category,
+          it.category,
+          `TRUE`,
+          `Size / Pack`,
+          it.size || `Standard`,
+          Number(it.price) || 0,
+          `PHP`,
+          `${it.name} ${it.size || ''}`.trim(),
+          `active`
+        ].map(toStoreCell).join(`,`);
+      });
+
+      const spreadsheetText = [headers.map(toStoreCell).join(`,`)].concat(rows).join(`\n`);
+      const filename = `cake-avenue-store-catalog.csv`;
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === `function`) {
+        window.notebookAppApi.triggerFileDownload({
+          content: spreadsheetText,
+          contentType: `text/csv`,
+          encoding: `UTF-8`,
+          filename: filename
+        });
+      } else {
+        const blob = new Blob([spreadsheetText], { type: `text/csv;charset=utf-8;` });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement(`a`);
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      }
+
+      unsavedCount = 0;
+      updateUnsavedBadges();
+      persistState();
+      showFeedback(`Downloaded store-ready spreadsheet for ${catalogItems.length} bakery items!`, false);
+    }
+
+    function toggleCanvaGuide() {
+      const body = document.getElementById(`canva-guide-body`);
+      const btn = document.getElementById(`btn-toggle-guide`);
+      if (!body || !btn) return;
+      const isHidden = body.style.display === `none`;
+      body.style.display = isHidden ? `block` : `none`;
+      btn.textContent = isHidden ? `Hide Guide` : `Show Guide`;
+    }
+
+    function setupPhotoDragDrop() {
+      const zone = document.getElementById(`photo-dropzone`);
+      if (!zone) return;
+      zone.addEventListener(`dragover`, function (e) {
+        e.preventDefault();
+        zone.classList.add(`is-dragover`);
+      });
+      zone.addEventListener(`dragleave`, function () {
+        zone.classList.remove(`is-dragover`);
+      });
+      zone.addEventListener(`drop`, function (e) {
+        e.preventDefault();
+        zone.classList.remove(`is-dragover`);
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+          processPhotoFile(e.dataTransfer.files[0]);
+        }
+      });
+    }
+
+    async function initApp() {
+      setupPhotoDragDrop();
+      const pasteModal = document.getElementById(`paste-modal`);
+      if (pasteModal) {
+        pasteModal.addEventListener(`click`, function (e) {
+          if (e.target === pasteModal) closePasteModal();
+        });
+      }
+      document.addEventListener(`keydown`, function (e) {
+        if (e.key === `Escape`) closePasteModal();
+      });
+      previewMarkupHelper();
+      await restoreState();
+      updateUnsavedBadges();
+      updateSummaryMetrics();
+      renderCatalogTable();
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+        window.notebookAppApi.notifyAppReady();
+      }
+    }
+
+    if (document.readyState === `loading`) {
+      document.addEventListener(`DOMContentLoaded`, initApp);
+    } else {
+      initApp();
+    }
+  </script>
+</body>
+</html>
